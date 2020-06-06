@@ -1,23 +1,22 @@
-FROM centos:7
+FROM ubuntu:18.04
 
-RUN yum update -y
+# install software
+ENV DEBIAN_FRONTEND=noninteractive 
+RUN apt-get update -y
+RUN apt-get install -y apache2 gettext-base libapache2-mod-auth-openidc  
 
-# install apache httpd
-RUN yum install -y httpd gettext
-
-# install mod_auth_openidc
-RUN yum install -y mod_auth_openidc
-
-# copy in config
-RUN mkdir -p /conf
-ADD config/oidc_auth.conf /etc/httpd/conf.d/auth.conf.template
-
-# add statup script
-ADD run-httpd.sh /run-httpd.sh
-RUN chmod -v +x /run-httpd.sh
+# install apache config and modules
+COPY config/oidc_auth.conf /apache.conf
+RUN cd /etc/apache2/mods-enabled; ln -s ../mods-available/proxy.load
+RUN cd /etc/apache2/mods-enabled; ln -s ../mods-available/proxy_wstunnel.load
+RUN cd /etc/apache2/mods-enabled; ln -s ../mods-available/rewrite.load
+RUN cd /etc/apache2/mods-enabled; ln -s ../mods-available/proxy_http.load
 
 COPY docker-entrypoint.sh /
 ENTRYPOINT ["/docker-entrypoint.sh"]
 
-# run httpd
-CMD [ "/run-httpd.sh" ]
+# expose apache2 port
+EXPOSE 80
+
+# run httpd in the foreground
+CMD /usr/sbin/apache2ctl -D FOREGROUND
