@@ -11,6 +11,7 @@ RUN cd /etc/apache2/mods-enabled; ln -s ../mods-available/proxy.load
 RUN cd /etc/apache2/mods-enabled; ln -s ../mods-available/proxy_wstunnel.load
 RUN cd /etc/apache2/mods-enabled; ln -s ../mods-available/rewrite.load
 RUN cd /etc/apache2/mods-enabled; ln -s ../mods-available/proxy_http.load
+RUN cd /etc/apache2/mods-enabled; ln -s ../mods-available/headers.load
 
 COPY docker-entrypoint.sh /
 ENTRYPOINT ["/docker-entrypoint.sh"]
